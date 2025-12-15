@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 - Improved comments, more descriptive
 - Translation of comments, error messages and documentation to English
 
+- Por mayor rendimiento solo busca nuevos archivos dentro de la carpeta `/lib` 
 
 ---
 
@@ -67,3 +68,4 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 - Mejora de comentarios, más descriptivos
 - Traducción de comentarios, mensajes de error y documentación al inglés.
 
+- For better performance, only searches for new files within the `/lib` folder

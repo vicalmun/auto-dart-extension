@@ -3,18 +3,18 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Dart Auto Extension está activa');
+	console.log('Dart Auto Extension is active');
 
-	// Escucha cuando se crean archivos con el FileSystemWatcher
+	// Listen when files are created with FileSystemWatcher
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (workspaceFolders) {
 		workspaceFolders.forEach(folder => {
-			// Vigilar todos los archivos creados sin extensión
+			// Watch all files created without extension in any lib folder
 			const watcher = vscode.workspace.createFileSystemWatcher(
-				new vscode.RelativePattern(folder, '**/*'),
-				false, // no ignorar creates
-				true,  // ignorar changes
-				true   // ignorar deletes
+				new vscode.RelativePattern(folder, '**/lib/**/*'),
+				false, // don't ignore creates
+				true,  // ignore changes
+				true   // ignore deletes
 			);
 
 			watcher.onDidCreate(async (uri) => {
@@ -25,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	}
 
-	// También escuchar el evento onWillCreateFiles (para algunos casos)
+	// Also listen to the onWillCreateFiles event (for some cases)
 	const willCreateDisposable = vscode.workspace.onWillCreateFiles(async (event) => {
 		if (!isDartWorkspace()) {
 			return;
@@ -61,13 +61,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(willCreateDisposable);
 
-	// Comando manual para convertir archivos
+	// Manual command to convert files
 	const convertCommand = vscode.commands.registerCommand(
 		'dart-auto-extension.convertToDart',
 		async () => {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				vscode.window.showErrorMessage('No hay ningún archivo abierto');
+				vscode.window.showErrorMessage('No file is open');
 				return;
 			}
 
@@ -75,7 +75,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const fileName = path.basename(currentPath);
 
 			if (fileName.includes('.')) {
-				vscode.window.showInformationMessage('El archivo ya tiene extensión');
+				vscode.window.showInformationMessage('File already has an extension');
 				return;
 			}
 
@@ -86,9 +86,9 @@ export function activate(context: vscode.ExtensionContext) {
 					editor.document.uri,
 					vscode.Uri.file(newPath)
 				);
-				vscode.window.showInformationMessage(`Archivo renombrado a ${path.basename(newPath)}`);
+				vscode.window.showInformationMessage(`File renamed to ${path.basename(newPath)}`);
 			} catch (error) {
-				vscode.window.showErrorMessage(`Error al renombrar: ${error}`);
+				vscode.window.showErrorMessage(`Error renaming: ${error}`);
 			}
 		}
 	);
@@ -97,7 +97,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 /**
- * Maneja la creación de archivos y agrega extensión .dart si es necesario
+ * Handles file creation and adds .dart extension if necessary
  */
 async function handleFileCreation(uri: vscode.Uri): Promise<void> {
 	if (!isDartWorkspace()) {
@@ -107,55 +107,55 @@ async function handleFileCreation(uri: vscode.Uri): Promise<void> {
 	const filePath = uri.fsPath;
 	const fileName = path.basename(filePath);
 
-	// Comprueba si el archivo no tiene extensión
+	// Check if the file has no extension
 	const hasExtension = fileName.includes('.');
 
 	if (hasExtension || fileName.length === 0) {
 		return;
 	}
 
-	// Esperar un poco para que el archivo se cree completamente (por seguridad)
+	// Wait a bit for the file to be fully created (for safety)
 	await new Promise(resolve => setTimeout(resolve, 100));
 
-	// si el archivo existe
+	// Check if the file exists
 	try {
 		await vscode.workspace.fs.stat(uri);
 	} catch {
-		// si no existe
+		// If it doesn't exist
 		return;
 	}
 
-	// Crear la nueva ruta con la extensión .dart
+	// Create the new path with the .dart extension
 	const newPath = filePath + '.dart';
 	const newUri = vscode.Uri.file(newPath);
 
 	try {
-		// Verificar si ya existe un archivo con ese nombre
+		// Check if a file with that name already exists
 		try {
 			await vscode.workspace.fs.stat(newUri);
-			console.log(`El archivo ${newPath} ya existe, no se puede renombrar`);
+			console.log(`File ${newPath} already exists, cannot rename`);
 			return;
 		} catch {
-			// El archivo no existe, podemos continuar
+			// File doesn't exist, we can continue
 		}
 
-		// Renombrar el archivo
+		// Rename the file
 		await vscode.workspace.fs.rename(uri, newUri);
-		console.log(`Archivo renombrado: ${fileName} → ${fileName}.dart`);
+		console.log(`File renamed: ${fileName} → ${fileName}.dart`);
 
-		// Abrir el archivo renombrado si no hay editor activo
+		// Open the renamed file if there's no active editor
 		const activeEditor = vscode.window.activeTextEditor;
 		if (!activeEditor || activeEditor.document.uri.fsPath === filePath) {
 			const document = await vscode.workspace.openTextDocument(newUri);
 			await vscode.window.showTextDocument(document);
 		}
 	} catch (error) {
-		console.error('Error al renombrar archivo:', error);
+		console.error('Error renaming file:', error);
 	}
 }
 
 /**
- * Verifica si el workspace actual es un proyecto Dart/Flutter
+ * Checks if the current workspace is a Dart/Flutter project
  */
 function isDartWorkspace(): boolean {
 	const config = vscode.workspace.getConfiguration('dartAutoExtension');
@@ -171,7 +171,7 @@ function isDartWorkspace(): boolean {
 		return false;
 	}
 
-	// Verificar si existe pubspec.yaml en alguna carpeta
+	// Check if pubspec.yaml exists in any folder
 	for (const folder of workspaceFolders) {
 		const pubspecPath = path.join(folder.uri.fsPath, 'pubspec.yaml');
 		try {
@@ -179,11 +179,11 @@ function isDartWorkspace(): boolean {
 				return true;
 			}
 		} catch {
-			// Ignorar errores
+			// Ignore errors
 		}
 	}
 
-	// Verificar si hay documentos Dart abiertos
+	// Check if there are open Dart documents
 	const hasDartDoc = vscode.workspace.textDocuments.some(
 		doc => doc.languageId === 'dart' || doc.fileName.endsWith('.dart')
 	);
@@ -192,5 +192,5 @@ function isDartWorkspace(): boolean {
 }
 
 export function deactivate() {
-	console.log('Dart Auto Extension ha sido desactivada');
+	console.log('Dart Auto Extension has been deactivated');
 }
