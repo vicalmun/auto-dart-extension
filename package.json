@@ -2,7 +2,7 @@
   "name": "dart-auto-extension",
   "displayName": "Dart Auto Extension",
   "description": "Agrega automáticamente la extensión .dart a archivos creados sin extensión en proyectos Flutter/Dart",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "publisher": "vicalmun",
   "icon": "icon.png",
   "homepage": "https://github.com/vicalmun/dart-auto-extension#readme",
