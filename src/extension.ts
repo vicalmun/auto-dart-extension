@@ -117,9 +117,12 @@ async function handleFileCreation(uri: vscode.Uri): Promise<void> {
 	// Wait a bit for the file to be fully created (for safety)
 	await new Promise(resolve => setTimeout(resolve, 100));
 
-	// Check if the file exists
+	// Check if the file exists and is not a directory
 	try {
-		await vscode.workspace.fs.stat(uri);
+		const stat = await vscode.workspace.fs.stat(uri);
+		if (stat.type === vscode.FileType.Directory) {
+			return;
+		}
 	} catch {
 		// If it doesn't exist
 		return;

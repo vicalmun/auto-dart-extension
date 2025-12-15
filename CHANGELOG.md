@@ -31,7 +31,12 @@ All notable changes to this project will be documented in this file.
 - Improved comments, more descriptive
 - Translation of comments, error messages and documentation to English
 
-- Por mayor rendimiento solo busca nuevos archivos dentro de la carpeta `/lib` 
+- For better performance, only searches for new files within the `/lib` folder
+
+## [1.0.2] - December 16, 2025
+
+- Fixed a bug that was renaming folders with `.dart`
+
 
 ---
 
@@ -68,4 +73,8 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 - Mejora de comentarios, más descriptivos
 - Traducción de comentarios, mensajes de error y documentación al inglés.
 
-- For better performance, only searches for new files within the `/lib` folder
+- Por mayor rendimiento solo busca nuevos archivos dentro de la carpeta `/lib` 
+
+## [1.0.2] - 16 de diciembre de 2025
+
+- Arregla un error que renombraba las carpetas con `.dart`
